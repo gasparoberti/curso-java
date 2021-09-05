@@ -41,7 +41,8 @@ async function eliminarUsuario(id) {
                 'Content-Type' : 'application/json'
             }
         });
-        $('#usuariosTable').DataTable().ajax.reload();
+//        $('#usuariosTable').DataTable().ajax.reload();
+        location.reload();  //recarga toda la pág.
     }
     else
         return;
