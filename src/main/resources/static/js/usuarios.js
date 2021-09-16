@@ -2,15 +2,18 @@
 $(document).ready(function() {
   cargarUsuarios();
   $('#usuariosTable').DataTable();
+
+  actualizarEmailUsuarioLogueado();
 });
+
+function actualizarEmailUsuarioLogueado() {
+    document.getElementById("txtEmailLoged").outerHTML = localStorage.email;
+}
 
 async function cargarUsuarios() {
     const request = await fetch('api/usuarios', {
     method: 'GET',
-    headers: {
-        'Acept' : 'application/json',
-        'Content-Type' : 'application/json'
-    }
+    headers: getHeaders()
     });
 
     const usuarios = await request.json();
@@ -32,14 +35,19 @@ async function cargarUsuarios() {
     document.querySelector('#usuariosTable tbody').outerHTML = listadoHtml
 }
 
+function getHeaders() {
+    return {
+           'Acept' : 'application/json',
+           'Content-Type' : 'application/json',
+           'Authorization' : localStorage.token
+            }
+}
+
 async function eliminarUsuario(id) {
     if (confirm("¿Desea eliminar el usuario " + id + "?")) {
         const request = await fetch('api/usuarios/' + id, {
             method: 'DELETE',
-            headers: {
-                'Acept' : 'application/json',
-                'Content-Type' : 'application/json'
-            }
+            headers: getHeaders()
         });
 //        $('#usuariosTable').DataTable().ajax.reload();
         location.reload();  //recarga toda la pág.
