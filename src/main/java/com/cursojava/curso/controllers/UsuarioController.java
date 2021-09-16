@@ -2,6 +2,7 @@ package com.cursojava.curso.controllers;
 
 import com.cursojava.curso.dao.UsuarioDao;
 import com.cursojava.curso.models.Usuario;
+import com.cursojava.curso.utils.JWTUtil;
 import de.mkammerer.argon2.Argon2;
 import de.mkammerer.argon2.Argon2Factory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,9 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioDao usuarioDao;
+
+    @Autowired
+    private JWTUtil jwtUtil;
 
     @RequestMapping(value = "prueba")
     public List<String> prueba() {
@@ -37,8 +41,16 @@ public class UsuarioController {
     }
 
     @RequestMapping(value = "api/usuarios", method = RequestMethod.GET)
-    public List<Usuario> getUsuarios() {
+    public List<Usuario> getUsuarios(@RequestHeader(value="Authorization") String token) {
+        if (!validarToken(token))
+            return null;
+
         return usuarioDao.getUsuarios();
+    }
+
+    private boolean validarToken(String token) {
+        String usuarioId = jwtUtil.getKey(token);
+        return usuarioId != null;
     }
 
     @RequestMapping(value = "api/usuarios", method = RequestMethod.POST)
@@ -51,7 +63,11 @@ public class UsuarioController {
     }
 
     @RequestMapping(value = "api/usuarios/{id}", method = RequestMethod.DELETE)
-    public void deleteUsuario(@PathVariable Long id) {
+    public void deleteUsuario(@PathVariable Long id,
+                              @RequestHeader(value="Authorization") String token) {
+        if (!validarToken(token))
+            return;
+
         usuarioDao.deleteUsuario(id);
     }
 }
